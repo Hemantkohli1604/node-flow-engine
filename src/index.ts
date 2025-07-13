@@ -1,9 +1,9 @@
-import { ExecutorEngine } from './core/ExecutionEngine';
+import { ExecutorEngine } from './core/ExecutorEngine';
 import { FlowParser } from './core/FlowParser';
 import { NodeRegistry } from './core/NodeRegistry';
 import { FlowDefinition } from './models/FlowDefinition';
-import { AddCorrelationIdNode } from './nodes/AddCorrelationIdNode';
-import { GetOAuthTokenNode } from './nodes/GetOAuthTokenNode';
+// We now import the manifest which maps node types to their modules.
+import { nodeManifest } from './nodes/node-manifest';
 
 async function main() {
   // 1. Define the flow structure
@@ -23,10 +23,9 @@ async function main() {
     edges: [{ source: '1', target: '2' }],
   };
 
-  // 2. Set up the NodeRegistry with available node types
-  const nodeRegistry = new NodeRegistry();
-  nodeRegistry.register('AddCorrelationId', new AddCorrelationIdNode());
-  nodeRegistry.register('GetOAuthToken', new GetOAuthTokenNode());
+  // 2. Set up the NodeRegistry with the manifest. The registry will now
+  // handle loading the correct node logic on-demand.
+  const nodeRegistry = new NodeRegistry(nodeManifest);
 
   // 3. Parse the flow to get a validated execution plan
   const flowParser = new FlowParser(flowDefinition);

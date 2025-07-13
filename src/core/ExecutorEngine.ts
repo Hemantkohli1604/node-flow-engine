@@ -17,7 +17,7 @@ export class ExecutorEngine {
     context.variables = { ...initialContext };
 
     for (const node of executionOrder) {
-      const executor = this.nodeRegistry.get(node.type);
+      const executor = await this.nodeRegistry.get(node.type);
       await executor.execute(node.data.parameters, context);
     }
     return context;
