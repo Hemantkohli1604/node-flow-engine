@@ -137,3 +137,8 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+
+# Ignore package-lock.json and yarn.lock files
+package-lock.json
+yarn.lock
