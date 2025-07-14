@@ -5,9 +5,12 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "ts-node src/index.ts",
+    "start": "func start --verbose",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prestart": "npm run build"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.7.2"
   },
   "author": "Hemant Kohli",
   "license": "ISC",

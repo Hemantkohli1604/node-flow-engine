@@ -9,8 +9,15 @@ export type NodeManifest = Record<string, string>;
  */
 export class NodeRegistry {
   private readonly executors = new Map<string, NodeExecutor>();
+  private readonly nodeModuleBasePath: string;
 
-  constructor(private manifest: NodeManifest) {}
+  constructor(
+    private manifest: NodeManifest,
+    // The base path can be configured via an environment variable in a real environment.
+    nodeModuleBasePath: string = '../nodes/'
+  ) {
+    this.nodeModuleBasePath = nodeModuleBasePath;
+  }
 
   /**
    * Retrieves an executor for a given node type.
@@ -30,8 +37,8 @@ export class NodeRegistry {
     }
 
     try {
-      // Dynamically import the module. The path is relative to the `src/nodes` directory.
-      const modulePath = `../nodes/${moduleName}`;
+      // Dynamically import the module from the configured base path.
+      const modulePath = `${this.nodeModuleBasePath}${moduleName}`;
       const module = await import(modulePath);
 
       // Convention: The exported class name is the node type + "Node".
