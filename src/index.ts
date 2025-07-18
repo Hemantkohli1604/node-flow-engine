@@ -3,6 +3,7 @@ import * as path from "path";
 import { runFlow } from "./engine";
 import { FlowDefinition } from "./models/FlowDefinition";
 import { NodeManifest } from "./core/NodeRegistry";
+import { apiContainerPromise } from "./config/cosmosConfig";  
 
 app.http('HttpFlowRunner', {
     methods: ['POST'],
@@ -21,11 +22,37 @@ app.http('HttpFlowRunner', {
                 };
             }
 
-            // In a real application, you would fetch this from a persistent store like Cosmos DB or Table Storage.
-            const nodeManifest: NodeManifest = {
-                AddCorrelationId: 'AddCorrelationIdNode',
-                GetOAuthToken: 'GetOAuthTokenNode',
-            };
+            // // In a real application, you would fetch this from a persistent store like Cosmos DB or Table Storage.
+            // const nodeManifest: NodeManifest = {
+            //     AddCorrelationId: 'AddCorrelationIdNode',
+            //     GetOAuthToken: 'GetOAuthTokenNode',
+            // };
+            // Fetch the node manifest from Cosmos DB
+            context.log("Connecting to Cosmos DB to fetch node manifest...");
+            // Wait for the Cosmos DB container to be ready
+            const apiContainer = await apiContainerPromise;
+            context.log("Fetching node manifest from Cosmos DB...");
+            
+
+            const manifestDocs = await apiContainer.items.readAll().fetchAll();
+            const nodeManifest: NodeManifest = {};
+            manifestDocs.resources.forEach(doc => {
+              nodeManifest[doc.id as string] = doc.module;
+            });
+            
+            // Assuming the node manifest is stored in a specific container
+            // const nodeManifest: NodeManifest = await apiContainer.items.readAll<NodeManifest>().fetchAll()
+            //     .then(result => result.resources[0]) // Assuming the first item is the manifest
+            //     .catch(error => {
+            //         context.log("Failed to fetch node manifest from Cosmos DB:", error);
+            //         throw new Error("Could not retrieve node manifest.");
+            //     });
+            if (!nodeManifest) {
+                return {
+                    status: 500,
+                    jsonBody: { message: "Node manifest not found in Cosmos DB." }
+                };
+            }
 
             // This path points to the location of your compiled node modules.
             // It's configured in local.settings.json for local development and App Settings in Azure.

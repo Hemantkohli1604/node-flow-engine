@@ -10,7 +10,9 @@
     "prestart": "npm run build"
   },
   "dependencies": {
-    "@azure/functions": "^4.7.2"
+    "@azure/functions": "^4.7.2",
+    "@azure/cosmos": "^4.2.0",
+    "@azure/identity": "^4.9.1"
   },
   "author": "Hemant Kohli",
   "license": "ISC",
